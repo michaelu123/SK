@@ -453,6 +453,15 @@ function sendNotFoundEmail(empfaenger, name, num) {
 function sendImgEmail(empfaenger, img) {
   var subject = "Ihre Saisonkarte";
   var body =
-    "Anbei Ihre Saisonkarte. Bitte auf dem Handy speichern oder ausdrucken. Hinweis: Manchmal fehlt beim Anhang die korrekte Dateiendung .png Falls dies der Fall sein sollte, kann das Mail-Programm die Datei nicht korrekt darstellen. Bitte ggf. manuell korrigieren oder uns Bescheid geben.";
-  GmailApp.sendEmail(empfaenger, subject, body, { attachments: img });
+    "Anbei Ihre Saisonkarte, als Bild-Datei (im Format png) und als PDF-Datei. Bitte auf dem Handy speichern oder ausdrucken.";
+
+  var base64 = Utilities.base64Encode(img.getBlob().getBytes());
+  var html = '<img src="data:image/png;base64,' + base64 + '" />';
+
+  // create a blob, convert to PDF
+  var blob = Utilities.newBlob(html, MimeType.HTML).setName('saisonkarte.pdf');
+
+  var pdf = blob.getAs(MimeType.PDF);
+  
+  GmailApp.sendEmail(empfaenger, subject, body, { attachments: [img, pdf]  });
 }
